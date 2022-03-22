@@ -1,8 +1,11 @@
 package edu.temple.audiobookplayer
 
-class BookList {
+import android.os.Parcel
+import android.os.Parcelable
 
-    val list = ArrayList<Book>()
+class BookList() {
+
+    private val list : ArrayList<Book> = ArrayList<Book>()
 
     fun add(_book : Book){
         list.add(_book)
@@ -12,7 +15,7 @@ class BookList {
         list.remove(_book)
     }
 
-    fun get(x : Int) : Book{
+    operator fun get(x : Int) : Book{
         return list[x]
     }
 

@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">AudioBookPlayer</string>
+    <string-array
+        name = "book_titles">
+        <item>The Shining</item>
+        <item>Harry Potter</item>
+        <item>The Lord of the Rings</item>
+        <item>The Odyssey</item>
+        <item>Frankenstein</item>
+        <item>Game of Thrones</item>
+        <item>The Cat in the Hat</item>
+        <item>Goosebumps</item>
+        <item>Berenstain Bears</item>
+        <item>Moby Dick</item>
+    </string-array>
+    <string-array
+        name = "book_authors">
+        <item>Stephen King</item>
+        <item>J.K. Rowling</item>
+        <item>J.R.R Tolkien</item>
+        <item>Homer</item>
+        <item>Mary Shelley</item>
+        <item>George R.R Martin</item>
+        <item>Dr. Seuss</item>
+        <item>R. L. Stine</item>
+        <item>Stan and Jan Berenstain</item>
+        <item>Herman Melville</item>
+    </string-array>
 </resources>
