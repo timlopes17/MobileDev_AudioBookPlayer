@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -19,7 +20,7 @@ private const val BOOKS_KEY = "books_key"
  */
 class BookListFragment : Fragment() {
     private var books: BookList? = null
-    private var recyclerView : RecyclerView = null
+    private var recyclerView : RecyclerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +40,13 @@ class BookListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with (view as RecyclerView) {
-            layoutManager = LinearLayoutManager(requireContext())
+
+            books?.run{
+                val clickEvent = { book:String ->}
+
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = BookListAdapter(this, clickEvent)
+            }
         }
     }
 
@@ -50,14 +57,20 @@ class BookListFragment : Fragment() {
 
         class BookListViewHolder(_view: View) : RecyclerView.ViewHolder(_view){
             val view = _view;
+            val title = _view.findViewById<TextView>(R.id.titleTextView)
+            val author = _view.findViewById<TextView>(R.id.authorTextView)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookListViewHolder {
-            TODO("Not yet implemented")
+            return BookListViewHolder(
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.book_list_layout, parent, false)
+            )
         }
 
         override fun onBindViewHolder(holder: BookListViewHolder, position: Int) {
-            TODO("Not yet implemented")
+            holder.title.text = books[position].title
+            holder.author.text = books[position].author
         }
 
         override fun getItemCount(): Int {
@@ -66,20 +79,11 @@ class BookListFragment : Fragment() {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment BookListFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(list : BookList) =
             BookListFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(BOOKS_KEY, books)
+                    putParcelable(BOOKS_KEY, list)
                 }
             }
     }

@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/timlo/Desktop/School/Mobile_Dev/MobileDev_AudioBookPlayer/app/src/main/res/layout/activity_main.xml" value="0.140625" />
+        <entry key="..\:/Users/timlo/Desktop/School/Mobile_Dev/MobileDev_AudioBookPlayer/app/src/main/res/layout/book_list_layout.xml" value="0.375" />
+        <entry key="..\:/Users/timlo/Desktop/School/Mobile_Dev/MobileDev_AudioBookPlayer/app/src/main/res/layout/fragment_book_details.xml" value="0.140625" />
         <entry key="..\:/Users/timlo/Desktop/School/Mobile_Dev/MobileDev_AudioBookPlayer/app/src/main/res/layout/fragment_book_list.xml" value="0.25" />
         <entry key="..\:/Users/timlo/Desktop/School/Mobile_Dev/MobileDev_AudioBookPlayer/app/src/main/res/layout/fragment_selection.xml" value="0.1286231884057971" />
       </map>

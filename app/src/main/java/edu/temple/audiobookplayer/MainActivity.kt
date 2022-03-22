@@ -20,5 +20,12 @@ class MainActivity : AppCompatActivity() {
             //Log.d("TITLE", bookList[i].title)
             //Log.d("AUTHOR", bookList[i].author)
         }
+
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.container1,  BookListFragment.newInstance(bookList))
+            .commit()
     }
+
+
 }

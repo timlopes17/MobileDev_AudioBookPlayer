@@ -9,7 +9,7 @@ class BookList(): Parcelable {
     private val list : ArrayList<Book> = ArrayList<Book>()
 
     constructor(parcel: Parcel) : this() {
-
+        parcel.writeList(list)
     }
 
     fun add(_book : Book){
