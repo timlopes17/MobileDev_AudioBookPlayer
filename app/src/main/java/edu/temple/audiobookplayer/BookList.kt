@@ -2,10 +2,15 @@ package edu.temple.audiobookplayer
 
 import android.os.Parcel
 import android.os.Parcelable
+import java.io.Serializable
 
-class BookList() {
+class BookList(): Parcelable {
 
     private val list : ArrayList<Book> = ArrayList<Book>()
+
+    constructor(parcel: Parcel) : this() {
+
+    }
 
     fun add(_book : Book){
         list.add(_book)
@@ -21,5 +26,23 @@ class BookList() {
 
     fun size() : Int{
         return list.size
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<BookList> {
+        override fun createFromParcel(parcel: Parcel): BookList {
+            return BookList(parcel)
+        }
+
+        override fun newArray(size: Int): Array<BookList?> {
+            return arrayOfNulls(size)
+        }
     }
 }
