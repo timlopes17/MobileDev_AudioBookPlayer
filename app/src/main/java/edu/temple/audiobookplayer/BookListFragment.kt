@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -13,17 +14,16 @@ import androidx.recyclerview.widget.RecyclerView
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val BOOKS_KEY = "books_key"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [BookListFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class BookListFragment : Fragment() {
     private var books: BookList? = null
-    private var recyclerView : RecyclerView? = null
+    //private var recyclerView : RecyclerView? = null
+    private lateinit var bookViewModel : BookViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        bookViewModel = ViewModelProvider(requireActivity()).get(BookViewModel::class.java)
+
         arguments?.let {
             books = it.getParcelable(BOOKS_KEY)
         }
@@ -42,7 +42,10 @@ class BookListFragment : Fragment() {
         with (view as RecyclerView) {
 
             books?.run{
-                val clickEvent = { book:String ->}
+                val clickEvent = {
+                        book:Book -> bookViewModel.setSelectedBook(book)
+                        (requireActivity() as SelectionFragmentInterface).bookSelected()
+                }
 
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = BookListAdapter(this, clickEvent)
@@ -50,7 +53,7 @@ class BookListFragment : Fragment() {
         }
     }
 
-    class BookListAdapter(_books: BookList, _clickEvent: (String)->Unit) : RecyclerView.Adapter<BookListAdapter.BookListViewHolder>() {
+    class BookListAdapter(_books: BookList, _clickEvent: (Book)->Unit) : RecyclerView.Adapter<BookListAdapter.BookListViewHolder>() {
 
         val books = _books
         val clickEvent = _clickEvent
@@ -71,6 +74,7 @@ class BookListFragment : Fragment() {
         override fun onBindViewHolder(holder: BookListViewHolder, position: Int) {
             holder.title.text = books[position].title
             holder.author.text = books[position].author
+            holder.view.setOnClickListener { clickEvent(books[position]) }
         }
 
         override fun getItemCount(): Int {
@@ -86,5 +90,9 @@ class BookListFragment : Fragment() {
                     putParcelable(BOOKS_KEY, list)
                 }
             }
+    }
+
+    interface SelectionFragmentInterface {
+        fun bookSelected()
     }
 }
