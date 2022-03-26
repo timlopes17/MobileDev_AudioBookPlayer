@@ -17,6 +17,9 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         val titleArray: Array<String> = resources.getStringArray(R.array.book_titles)
         val authorArray: Array<String> = resources.getStringArray(R.array.book_authors)
 
+        lateinit var bookViewModel: BookViewModel
+        bookViewModel = ViewModelProvider(this).get(BookViewModel::class.java)
+
         for (i in 0..9){
             bookList.add(Book(titleArray[i], authorArray[i]))
             //Log.d("TITLE", bookList[i].title)
@@ -33,15 +36,19 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         else
             supportFragmentManager
             .beginTransaction()
-            .add(R.id.container1,  BookListFragment.newInstance(bookList))
+            .replace(R.id.container1,  BookListFragment.newInstance(bookList))
             .commit()
+
+        if(bookViewModel.getSelectedBook().value != null && findViewById<View>(R.id.container2) == null){
+            bookSelected()
         }
+    }
 
     override fun bookSelected() {
         if (findViewById<View>(R.id.container2) == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.container1, BookDetailsFragment(), "BackStack")
+                .replace(R.id.container1, BookDetailsFragment())
                 .addToBackStack(null)
                 .commit()
         }
