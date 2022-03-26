@@ -23,22 +23,27 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             //Log.d("AUTHOR", bookList[i].author)
         }
 
-        val fragment = supportFragmentManager.findFragmentById(R.id.container1)
-        if(fragment != null)
+        var fragment = supportFragmentManager.findFragmentById(R.id.container1)
+        if(fragment != null){
             supportFragmentManager.beginTransaction().remove(fragment).commit()
+        }
 
-        supportFragmentManager
+        if(supportFragmentManager.backStackEntryCount > 0)
+            supportFragmentManager.popBackStack()
+        else
+            supportFragmentManager
             .beginTransaction()
             .add(R.id.container1,  BookListFragment.newInstance(bookList))
             .commit()
         }
 
     override fun bookSelected() {
-        if (findViewById<View>(R.id.container2) == null)
+        if (findViewById<View>(R.id.container2) == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.container1, BookDetailsFragment())
+                .replace(R.id.container1, BookDetailsFragment(), "BackStack")
                 .addToBackStack(null)
                 .commit()
+        }
     }
 }
