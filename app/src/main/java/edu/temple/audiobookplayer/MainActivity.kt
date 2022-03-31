@@ -1,9 +1,12 @@
 package edu.temple.audiobookplayer
 
+import android.app.SearchManager
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import androidx.lifecycle.ViewModelProvider
 import edu.temple.audiobookplayer.Book
 import edu.temple.audiobookplayer.BookList
@@ -14,16 +17,17 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         setContentView(R.layout.activity_main)
 
         val bookList = BookList()
-        val titleArray: Array<String> = resources.getStringArray(R.array.book_titles)
-        val authorArray: Array<String> = resources.getStringArray(R.array.book_authors)
+        val searchButton = findViewById<Button>(R.id.searchButton)
+
+        searchButton.setOnClickListener {
+            onSearchRequested()
+        }
 
         lateinit var bookViewModel: BookViewModel
         bookViewModel = ViewModelProvider(this).get(BookViewModel::class.java)
 
         for (i in 0..9){
-            bookList.add(Book(titleArray[i], authorArray[i]))
-            //Log.d("TITLE", bookList[i].title)
-            //Log.d("AUTHOR", bookList[i].author)
+            //bookList.add(Book(titleArray[i], authorArray[i]))
         }
 
         var fragment = supportFragmentManager.findFragmentById(R.id.container1)
