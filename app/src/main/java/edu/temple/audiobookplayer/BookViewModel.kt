@@ -3,6 +3,7 @@ package edu.temple.audiobookplayer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+
 class BookViewModel : ViewModel() {
     val selectedBook : MutableLiveData<Book> by lazy {
         MutableLiveData<Book>()

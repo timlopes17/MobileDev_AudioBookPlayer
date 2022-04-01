@@ -1,6 +1,7 @@
 package edu.temple.audiobookplayer
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,18 +16,15 @@ import androidx.recyclerview.widget.RecyclerView
 private const val BOOKS_KEY = "books_key"
 
 class BookListFragment : Fragment() {
-    private var books: BookList? = null
     //private var recyclerView : RecyclerView? = null
     private lateinit var bookViewModel : BookViewModel
+    private lateinit var bookListVM: BookListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         bookViewModel = ViewModelProvider(requireActivity()).get(BookViewModel::class.java)
-
-        arguments?.let {
-            books = it.getParcelable(BOOKS_KEY)
-        }
+        bookListVM = ViewModelProvider(requireActivity()).get(BookListViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -41,10 +39,27 @@ class BookListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         with (view as RecyclerView) {
 
+            var books: BookList = BookList()
+
+            bookListVM.getIncrement().observe(requireActivity()) {
+
+                books = bookListVM.getBookList()
+
+                books?.run{
+                    val clickEvent = {
+                            book:Book -> bookViewModel.setSelectedBook(book)
+                        (requireActivity() as SelectionFragmentInterface).bookSelected()
+                    }
+
+                    layoutManager = LinearLayoutManager(getContext())
+                    adapter = BookListAdapter(this, clickEvent)
+                }
+            }
+
             books?.run{
                 val clickEvent = {
                         book:Book -> bookViewModel.setSelectedBook(book)
-                        (requireActivity() as SelectionFragmentInterface).bookSelected()
+                    (requireActivity() as SelectionFragmentInterface).bookSelected()
                 }
 
                 layoutManager = LinearLayoutManager(requireContext())
@@ -80,16 +95,6 @@ class BookListFragment : Fragment() {
         override fun getItemCount(): Int {
             return books.size()
         }
-    }
-
-    companion object {
-        @JvmStatic
-        fun newInstance(list : BookList) =
-            BookListFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(BOOKS_KEY, list)
-                }
-            }
     }
 
     interface SelectionFragmentInterface {

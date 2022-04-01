@@ -20,6 +20,10 @@ class BookList(): Parcelable {
         list.remove(_book)
     }
 
+    fun clear(){
+        list.removeAll(list)
+    }
+
     operator fun get(x : Int) : Book{
         return list[x]
     }

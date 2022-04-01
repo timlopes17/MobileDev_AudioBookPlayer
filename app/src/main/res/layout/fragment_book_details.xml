@@ -12,23 +12,23 @@
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="match_parent"
-        android:layout_height="150sp"
+        android:layout_height="80sp"
         android:gravity="center"
-        android:text="Title"
-        android:textSize="50sp" />
+        android:textSize="25sp"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="400sp"
+        android:layout_height="170sp"
+        android:layout_gravity="center|center_vertical"
         tools:src="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/authorDetail"
         android:layout_width="match_parent"
-        android:layout_height="150sp"
+        android:layout_height="50sp"
         android:gravity="center"
-        android:text="Author"
         android:textSize="20sp" />
 
 </LinearLayout>
