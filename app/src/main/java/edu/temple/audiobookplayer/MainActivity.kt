@@ -19,9 +19,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URL
 
-lateinit var bookListVM: BookListViewModel
-
 class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInterface {
+
+    lateinit var bookListVM: BookListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
