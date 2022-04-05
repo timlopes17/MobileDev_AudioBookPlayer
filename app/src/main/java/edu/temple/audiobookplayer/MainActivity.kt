@@ -72,6 +72,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     suspend fun searchBooks(search: String) {
 
+        var thisSearch = search
         var jsonArray: JSONArray
         var jsonObject: JSONObject
         var tempTitle: String
@@ -81,9 +82,13 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         var tempBook: Book
         var tempBookList: BookList = BookList()
 
+        if(thisSearch.equals("*")){
+            thisSearch = "";
+        }
+
         withContext(Dispatchers.IO) {
             jsonArray = JSONArray(
-                URL("https://kamorris.com/lab/cis3515/search.php?term=$search")
+                URL("https://kamorris.com/lab/cis3515/search.php?term=$thisSearch")
                     .openStream()
                     .bufferedReader()
                     .readLine()

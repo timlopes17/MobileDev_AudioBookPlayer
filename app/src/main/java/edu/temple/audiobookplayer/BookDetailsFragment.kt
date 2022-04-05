@@ -37,6 +37,7 @@ class BookDetailsFragment : Fragment() {
             title.text = it.title
             author.text = it.author
             Picasso.get().load(it.coverURL).into(image)
+
         }
     }
 }
