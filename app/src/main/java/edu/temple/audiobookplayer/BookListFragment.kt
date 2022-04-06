@@ -53,17 +53,9 @@ class BookListFragment : Fragment() {
 
                     layoutManager = LinearLayoutManager(getContext())
                     adapter = BookListAdapter(this, clickEvent)
-                }
-            }
 
-            books?.run{
-                val clickEvent = {
-                        book:Book -> bookViewModel.setSelectedBook(book)
-                    (requireActivity() as SelectionFragmentInterface).bookSelected()
+                    adapter?.notifyDataSetChanged()
                 }
-
-                layoutManager = LinearLayoutManager(requireContext())
-                adapter = BookListAdapter(this, clickEvent)
             }
         }
     }

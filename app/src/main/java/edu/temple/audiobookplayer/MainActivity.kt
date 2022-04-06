@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                 supportFragmentManager.popBackStack()
         }
 
-
         var fragment = supportFragmentManager.findFragmentById(R.id.container1)
         if (fragment != null) {
             supportFragmentManager.beginTransaction().remove(fragment).commit()
