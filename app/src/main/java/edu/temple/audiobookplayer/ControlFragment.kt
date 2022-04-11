@@ -33,7 +33,7 @@ class ControlFragment : Fragment() {
         val stopBut = view.findViewById<ImageButton>(R.id.stopButton)
         val pauseBut = view.findViewById<ImageButton>(R.id.pauseButton)
         val nowText = view.findViewById<TextView>(R.id.nowPlayingText)
-        val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
+        //val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
 
         bookViewModel.getSelectedBook().observe(requireActivity()) {
             nowText.text = it.title
