@@ -33,19 +33,35 @@ class ControlFragment : Fragment() {
         val stopBut = view.findViewById<ImageButton>(R.id.stopButton)
         val pauseBut = view.findViewById<ImageButton>(R.id.pauseButton)
         val nowText = view.findViewById<TextView>(R.id.nowPlayingText)
-        //val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
+        val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
+
+        stopBut.setOnClickListener {
+            (requireActivity() as ControlFragment.ControlFragmentInterface).stopBook()
+        }
+        pauseBut.setOnClickListener {
+            (requireActivity() as ControlFragment.ControlFragmentInterface).pauseBook()
+        }
+        seekBar?.setOnSeekBarChangeListener(object:
+            SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seek: SeekBar?, progress: Int, fromUser: Boolean) {
+
+            }
+
+            override fun onStartTrackingTouch(seek: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seek: SeekBar?) {
+                (requireActivity() as ControlFragment.ControlFragmentInterface).seekBook(seek!!.progress)
+            }
+        })
 
         bookViewModel.getSelectedBook().observe(requireActivity()) {
+            val tempBook = it
             nowText.text = it.title
 
             playBut.setOnClickListener {
-                (requireActivity() as ControlFragment.ControlFragmentInterface).playBook(it.id)
-            }
-            stopBut.setOnClickListener {
-                (requireActivity() as ControlFragment.ControlFragmentInterface).stopBook()
-            }
-            pauseBut.setOnClickListener {
-                (requireActivity() as ControlFragment.ControlFragmentInterface).pauseBook()
+                (requireActivity() as ControlFragment.ControlFragmentInterface).playBook(tempBook.id)
             }
         }
     }

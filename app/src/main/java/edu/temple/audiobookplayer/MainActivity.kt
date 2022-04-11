@@ -67,6 +67,10 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         if (bookViewModel.getSelectedBook().value != null && findViewById<View>(R.id.container2) == null) {
             bookSelected()
         }
+
+        bindService(Intent(this, PlayerService::class.java)
+            , serviceConnection
+            , BIND_AUTO_CREATE)
     }
 
     override fun bookSelected() {
@@ -84,10 +88,12 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         var thisSearch = search
         var jsonArray: JSONArray
         var jsonObject: JSONObject
+        var jsonObjectId: JSONObject
         var tempTitle: String
         var tempAuthor: String
         var tempId: Int
         var tempImg: String
+        var tempLength : Int
         var tempBook: Book
         var tempBookList: BookList = BookList()
 
@@ -112,7 +118,19 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             tempAuthor = jsonObject.getString("author")
             tempId = jsonObject.getInt("id")
             tempImg = jsonObject.getString("cover_url")
-            tempBook = Book(tempTitle, tempAuthor, tempId, tempImg)
+
+            withContext(Dispatchers.IO) {
+                jsonObjectId = JSONObject(
+                    URL("https://kamorris.com/lab/cis3515/book.php?id=$tempId")
+                        .openStream()
+                        .bufferedReader()
+                        .readLine()
+                )
+            }
+            Log.d("TEST", jsonObjectId.toString())
+            tempLength = jsonObjectId.getInt("duration")
+
+            tempBook = Book(tempTitle, tempAuthor, tempId, tempImg, tempLength)
             tempBookList.add(tempBook)
             Log.d("Book", "$tempTitle $tempAuthor $tempId $tempImg")
         }
@@ -136,10 +154,11 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
     }
 
     override fun playBook(bookId : Int) {
-        if(isConnected){
+        if(isConnected)
             audioBinder.play(bookId)
-        }
 
+        else
+            Log.d("Service", "NOT CONNECTED")
     }
 
     override fun stopBook() {
@@ -170,6 +189,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     val serviceConnection = object: ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            Log.d("Service", "CONNECTED")
             isConnected = true
             audioBinder = service as PlayerService.MediaControlBinder
             audioBinder.setProgressHandler(progressHandler)
@@ -177,6 +197,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
         override fun onServiceDisconnected(p0: ComponentName?) {
             isConnected = false
+            Log.d("Service", "DISCONNECTED")
         }
     }
 
