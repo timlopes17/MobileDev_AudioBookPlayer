@@ -1,9 +1,14 @@
 package edu.temple.audiobookplayer
 
 import android.app.SearchManager
+import android.content.ComponentName
 import android.content.Intent
+import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -11,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import edu.temple.audiobookplayer.Book
 import edu.temple.audiobookplayer.BookList
+import edu.temple.audlibplayer.PlayerService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,9 +25,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URL
 
-class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInterface {
+class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInterface, ControlFragment.ControlFragmentInterface {
 
     lateinit var bookListVM: BookListViewModel
+
+    lateinit var audioBinder : PlayerService.MediaControlBinder
+
+    var isConnected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,5 +133,54 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                 }
             }
         }
+    }
+
+    override fun playBook(bookId : Int) {
+        if(isConnected){
+            audioBinder.play(bookId)
+        }
+
+    }
+
+    override fun stopBook() {
+        if(isConnected) {
+            audioBinder.stop()
+        }
+    }
+
+    override fun pauseBook() {
+        if(isConnected) {
+            audioBinder.pause()
+        }
+    }
+
+    override fun seekBook(position: Int) {
+        if(isConnected) {
+            audioBinder.seekTo(position)
+        }
+    }
+
+    lateinit var bookProgress : PlayerService.BookProgress
+
+    val progressHandler = Handler(Looper.getMainLooper()){
+
+        bookProgress = it.obj as PlayerService.BookProgress
+        true
+    }
+
+    val serviceConnection = object: ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            isConnected = true
+            audioBinder = service as PlayerService.MediaControlBinder
+            audioBinder.setProgressHandler(progressHandler)
+        }
+
+        override fun onServiceDisconnected(p0: ComponentName?) {
+            isConnected = false
+        }
+    }
+
+    override fun getProgress() {
+
     }
 }

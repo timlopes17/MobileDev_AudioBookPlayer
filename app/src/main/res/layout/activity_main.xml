@@ -9,13 +9,13 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/container1"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="500sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.519"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchButton"
-        app:layout_constraintVertical_bias="0.609" />
+        app:layout_constraintVertical_bias="0.067" />
 
     <Button
         android:id="@+id/searchButton"
@@ -31,5 +31,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.009" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/controlContainer"
+        android:name="edu.temple.audiobookplayer.ControlFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/container1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
