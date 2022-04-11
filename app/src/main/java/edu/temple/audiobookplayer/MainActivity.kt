@@ -183,7 +183,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     val progressHandler = Handler(Looper.getMainLooper()){
 
-        bookProgress = it.obj as PlayerService.BookProgress
+        if(it.obj != null)
+            bookProgress = it.obj as PlayerService.BookProgress
         true
     }
 
