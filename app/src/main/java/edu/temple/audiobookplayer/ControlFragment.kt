@@ -37,6 +37,7 @@ class ControlFragment : Fragment() {
 
         stopBut.setOnClickListener {
             (requireActivity() as ControlFragment.ControlFragmentInterface).stopBook()
+            seekBar.progress = 0
         }
         pauseBut.setOnClickListener {
             (requireActivity() as ControlFragment.ControlFragmentInterface).pauseBook()
@@ -59,6 +60,8 @@ class ControlFragment : Fragment() {
         bookViewModel.getSelectedBook().observe(requireActivity()) {
             val tempBook = it
             nowText.text = it.title
+            seekBar.max = it.duration
+            seekBar.progress = 0
 
             playBut.setOnClickListener {
                 (requireActivity() as ControlFragment.ControlFragmentInterface).playBook(tempBook.id)
@@ -71,6 +74,5 @@ class ControlFragment : Fragment() {
         fun stopBook()
         fun pauseBook()
         fun seekBook(position: Int)
-        fun getProgress()
     }
 }

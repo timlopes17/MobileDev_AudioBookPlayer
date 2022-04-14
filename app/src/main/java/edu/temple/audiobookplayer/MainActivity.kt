@@ -81,6 +81,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                 .addToBackStack(null)
                 .commit()
         }
+
+        audioBinder.stop()
     }
 
     suspend fun searchBooks(search: String) {
@@ -156,7 +158,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
     override fun playBook(bookId : Int) {
         if(isConnected)
             audioBinder.play(bookId)
-
         else
             Log.d("Service", "NOT CONNECTED")
     }
@@ -179,12 +180,11 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         }
     }
 
-    lateinit var bookProgress : PlayerService.BookProgress
+    private var bookProgress : PlayerService.BookProgress? = null
+    var gotProgress = false
 
     val progressHandler = Handler(Looper.getMainLooper()){
-
-        if(it.obj != null)
-            bookProgress = it.obj as PlayerService.BookProgress
+        bookProgress = it.obj as? PlayerService.BookProgress
         true
     }
 
@@ -200,9 +200,5 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             isConnected = false
             Log.d("Service", "DISCONNECTED")
         }
-    }
-
-    override fun getProgress() {
-
     }
 }
