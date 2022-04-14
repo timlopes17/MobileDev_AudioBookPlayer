@@ -4,6 +4,7 @@ import android.app.SearchManager
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 import java.net.URL
 
 class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInterface, ControlFragment.ControlFragmentInterface {
@@ -155,9 +157,15 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         }
     }
 
-    override fun playBook(bookId : Int) {
-        if(isConnected)
-            audioBinder.play(bookId)
+    override fun playBook(bookId : Int, progress : Int) {
+        if(isConnected){
+            if(progress < 1)
+                audioBinder.play(bookId)
+            else{
+                Log.d("Service", "${bookUri.toString()}")
+                audioBinder.play(File(bookUri?.path), progress)
+            }
+        }
         else
             Log.d("Service", "NOT CONNECTED")
     }
@@ -181,10 +189,16 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
     }
 
     private var bookProgress : PlayerService.BookProgress? = null
+    private var bookUri : Uri? = null
     var gotProgress = false
 
     val progressHandler = Handler(Looper.getMainLooper()){
         bookProgress = it.obj as? PlayerService.BookProgress
+        Log.d("Service", "Progress: ${bookProgress?.progress}")
+        Log.d("Service", "URI: ${bookProgress?.bookUri}")
+        Log.d("Service", "Id: ${bookProgress?.bookId}")
+        bookUri = bookProgress?.bookUri
+        Log.d("Service", "bookUri: ${bookUri.toString()}")
         true
     }
 
