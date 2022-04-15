@@ -45,8 +45,8 @@ class ControlFragment : Fragment() {
             (requireActivity() as ControlFragment.ControlFragmentInterface).pauseBook()
         }
 
-        seekBar?.setOnSeekBarChangeListener(object:
-            SeekBar.OnSeekBarChangeListener{
+        seekBar?.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seek: SeekBar?, progress: Int, fromUser: Boolean) {
 
             }
@@ -66,24 +66,22 @@ class ControlFragment : Fragment() {
             seekBar.max = it.duration
 
             playBut.setOnClickListener {
-                (requireActivity() as ControlFragment.ControlFragmentInterface).playBook(tempBook.id, seekBar.progress)
-
-                val timer = Timer()
-                val monitor = object : TimerTask() {
-                    override fun run() {
-                        seekBar.progress = (requireActivity() as ControlFragment.ControlFragmentInterface).updateProgress()
-                    }
-                }
-                timer.schedule(monitor, 1000, 1000)
+                (requireActivity() as ControlFragment.ControlFragmentInterface).playBook(
+                    tempBook.id,
+                    seekBar.progress
+                )
             }
         }
     }
 
+    public fun getProgress(progress: Int) {
+        requireActivity().findViewById<SeekBar>(R.id.seekBar).progress = progress
+    }
+
     interface ControlFragmentInterface {
-        fun playBook(bookId : Int, progress: Int)
+        fun playBook(bookId: Int, progress: Int)
         fun stopBook()
         fun pauseBook()
         fun seekBook(position: Int)
-        fun updateProgress() : Int
     }
 }

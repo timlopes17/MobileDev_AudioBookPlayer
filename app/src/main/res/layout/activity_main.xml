@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#222222"
     tools:context=".MainActivity">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/container1"
         android:layout_width="0dp"
-        android:layout_height="300sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="0sp"
+        android:background="#222222"
+        app:layout_constraintBottom_toTopOf="@+id/controlContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,11 +23,14 @@
         android:id="@+id/searchButton"
         android:layout_width="361dp"
         android:layout_height="77dp"
+        android:backgroundTint="#101010"
         android:foregroundGravity="center"
         android:gravity="center"
         app:icon="@android:drawable/ic_menu_search"
         app:iconGravity="textStart"
         app:iconSize="50sp"
+        app:iconTint="#ff003c"
+        app:iconTintMode="multiply"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,11 +41,13 @@
         android:id="@+id/controlContainer"
         android:name="edu.temple.audiobookplayer.ControlFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="#E3E3E3"
+        android:layout_height="165sp"
+        android:background="#131313"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/container1" />
+        app:layout_constraintTop_toTopOf="@+id/searchButton"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
