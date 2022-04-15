@@ -131,12 +131,10 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                         .readLine()
                 )
             }
-            Log.d("TEST", jsonObjectId.toString())
             tempLength = jsonObjectId.getInt("duration")
 
             tempBook = Book(tempTitle, tempAuthor, tempId, tempImg, tempLength)
             tempBookList.add(tempBook)
-            Log.d("Book", "$tempTitle $tempAuthor $tempId $tempImg")
         }
 
         //if(jsonArray.length() != 0){
@@ -159,12 +157,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     override fun playBook(bookId : Int, progress : Int) {
         if(isConnected){
-            if(progress < 1)
-                audioBinder.play(bookId)
-            else{
-                Log.d("Service", "${bookUri.toString()}")
-                audioBinder.play(File(bookUri?.path), progress)
-            }
+            audioBinder.play(bookId)
         }
         else
             Log.d("Service", "NOT CONNECTED")
@@ -188,20 +181,21 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         }
     }
 
+    override fun updateProgress(): Int {
+        Log.d("Service", "Progress: ${bookProgress?.progress}")
+        if(bookProgress?.progress != null)
+            return bookProgress!!.progress
+        else
+            return 0
+    }
+
     private var bookProgress : PlayerService.BookProgress? = null
-    private var bookUri : Uri? = null
-    var gotProgress = false
 
     val progressHandler = Handler(Looper.getMainLooper()){
         bookProgress = it.obj as? PlayerService.BookProgress
-        Log.d("Service", "Progress: ${bookProgress?.progress}")
-        Log.d("Service", "URI: ${bookProgress?.bookUri}")
-        Log.d("Service", "Id: ${bookProgress?.bookId}")
-        bookUri = bookProgress?.bookUri
-        Log.d("Service", "bookUri: ${bookUri.toString()}")
         true
     }
-
+    //use bookProgress.progress to update the seekBar
     val serviceConnection = object: ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Log.d("Service", "CONNECTED")

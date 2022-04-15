@@ -1,6 +1,7 @@
 package edu.temple.audiobookplayer
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.squareup.picasso.Picasso
+import java.util.*
 
 class ControlFragment : Fragment() {
 
@@ -37,11 +39,12 @@ class ControlFragment : Fragment() {
 
         stopBut.setOnClickListener {
             (requireActivity() as ControlFragment.ControlFragmentInterface).stopBook()
-            seekBar.progress = 0
         }
+
         pauseBut.setOnClickListener {
             (requireActivity() as ControlFragment.ControlFragmentInterface).pauseBook()
         }
+
         seekBar?.setOnSeekBarChangeListener(object:
             SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seek: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -61,10 +64,17 @@ class ControlFragment : Fragment() {
             val tempBook = it
             nowText.text = it.title
             seekBar.max = it.duration
-            seekBar.progress = 0
 
             playBut.setOnClickListener {
                 (requireActivity() as ControlFragment.ControlFragmentInterface).playBook(tempBook.id, seekBar.progress)
+
+                val timer = Timer()
+                val monitor = object : TimerTask() {
+                    override fun run() {
+                        seekBar.progress = (requireActivity() as ControlFragment.ControlFragmentInterface).updateProgress()
+                    }
+                }
+                timer.schedule(monitor, 1000, 1000)
             }
         }
     }
@@ -74,5 +84,6 @@ class ControlFragment : Fragment() {
         fun stopBook()
         fun pauseBook()
         fun seekBook(position: Int)
+        fun updateProgress() : Int
     }
 }
