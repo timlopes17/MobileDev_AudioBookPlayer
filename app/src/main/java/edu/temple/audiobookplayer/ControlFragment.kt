@@ -67,8 +67,7 @@ class ControlFragment : Fragment() {
 
             playBut.setOnClickListener {
                 (requireActivity() as ControlFragment.ControlFragmentInterface).playBook(
-                    tempBook.id,
-                    seekBar.progress
+                    tempBook.id
                 )
             }
         }
@@ -80,7 +79,7 @@ class ControlFragment : Fragment() {
     }
 
     interface ControlFragmentInterface {
-        fun playBook(bookId: Int, progress: Int)
+        fun playBook(bookId: Int)
         fun stopBook()
         fun pauseBook()
         fun seekBook(position: Int)

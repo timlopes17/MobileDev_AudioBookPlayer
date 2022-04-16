@@ -35,21 +35,19 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     lateinit var controlFrag : ControlFragment
 
-    var isCreated = false
+    lateinit var bookViewModel: BookViewModel
 
     var isConnected = false
+    var once = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val searchButton = findViewById<Button>(R.id.searchButton)
-        lateinit var bookViewModel: BookViewModel
 
         bookListVM = ViewModelProvider(this).get(BookListViewModel::class.java)
         bookViewModel = ViewModelProvider(this).get(BookViewModel::class.java)
-
-        Log.d("TEST", "Main 1")
 
         searchButton.setOnClickListener {
             onSearchRequested()
@@ -79,8 +77,23 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             , BIND_AUTO_CREATE)
 
         controlFrag = supportFragmentManager.findFragmentById(R.id.controlContainer) as ControlFragment
+    }
 
-        isCreated = true
+    suspend fun updateControlFragment(bookId : Int){
+        Log.d("NewTest", "updateControlFragment")
+        val tempBook : Book
+        withContext(Dispatchers.IO) {
+            val jsonObject = JSONObject(
+                URL("https://kamorris.com/lab/cis3515/book.php?id=$bookId")
+                    .openStream()
+                    .bufferedReader()
+                    .readLine()
+            )
+            tempBook = Book(jsonObject.getString("title"), jsonObject.getString("author"),
+                jsonObject.getInt("id"), jsonObject.getString("cover_url"), jsonObject.getInt("duration"))
+        }
+        bookViewModel.setSelectedBook(tempBook)
+        once = false
     }
 
     override fun bookSelected() {
@@ -166,7 +179,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         }
     }
 
-    override fun playBook(bookId : Int, progress : Int) {
+    override fun playBook(bookId : Int) {
         if(isConnected){
             audioBinder.play(bookId)
         }
@@ -197,8 +210,21 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     val progressHandler = Handler(Looper.getMainLooper()){
         bookProgress = it.obj as? PlayerService.BookProgress
-        if(bookProgress?.progress != null && this::controlFrag.isInitialized && isCreated)
+        if(bookProgress?.progress != null && this::controlFrag.isInitialized)
             controlFrag.getProgress(bookProgress!!.progress)
+
+        if(audioBinder.isPlaying && once){
+            Log.d("NewTest", "isPlaying")
+            if(bookProgress?.progress != null && this@MainActivity::controlFrag.isInitialized){
+                Log.d("NewTest", "controlFrag is init")
+                CoroutineScope(Dispatchers.Main).launch() {
+                    updateControlFragment(bookProgress!!.bookId)
+                }
+            }
+            else
+                Log.d("NewTest", "controlFrag is NOT init")
+        }
+
         true
     }
 
@@ -214,5 +240,14 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             isConnected = false
             Log.d("Service", "DISCONNECTED")
         }
+    }
+
+    override fun onStop(){
+        val intent = Intent(this, PlayerService::class.java)
+        if (this != null) {
+            this.startService(intent)
+        }
+        Log.d("Service", "Activity onStop")
+        super.onStop()
     }
 }
