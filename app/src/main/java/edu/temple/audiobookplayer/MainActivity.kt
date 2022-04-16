@@ -35,6 +35,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     lateinit var controlFrag : ControlFragment
 
+    var isCreated = false
+
     var isConnected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +79,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             , BIND_AUTO_CREATE)
 
         controlFrag = supportFragmentManager.findFragmentById(R.id.controlContainer) as ControlFragment
+
+        isCreated = true
     }
 
     override fun bookSelected() {
@@ -87,8 +91,11 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                 .addToBackStack(null)
                 .commit()
         }
-        audioBinder.stop()
-        controlFrag.getProgress(0)
+        if(this::audioBinder.isInitialized)
+        {
+            audioBinder.stop()
+            controlFrag.getProgress(0)
+        }
     }
 
     suspend fun searchBooks(search: String) {
@@ -190,11 +197,11 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     val progressHandler = Handler(Looper.getMainLooper()){
         bookProgress = it.obj as? PlayerService.BookProgress
-        if(bookProgress != null)
+        if(bookProgress?.progress != null && this::controlFrag.isInitialized && isCreated)
             controlFrag.getProgress(bookProgress!!.progress)
         true
     }
-    //use bookProgress.progress to update the seekBar
+
     val serviceConnection = object: ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Log.d("Service", "CONNECTED")

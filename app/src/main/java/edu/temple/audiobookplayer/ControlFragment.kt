@@ -75,7 +75,8 @@ class ControlFragment : Fragment() {
     }
 
     public fun getProgress(progress: Int) {
-        requireActivity().findViewById<SeekBar>(R.id.seekBar).progress = progress
+        if(isAdded())
+            requireActivity().findViewById<SeekBar>(R.id.seekBar).progress = progress
     }
 
     interface ControlFragmentInterface {

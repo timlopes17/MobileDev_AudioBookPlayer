@@ -3,44 +3,64 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#222222">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/container1"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="295dp"
+        android:layout_height="235dp"
+        android:background="#222222"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.006"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchButton"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintVertical_bias="1.0"
         app:layout_constraintWidth_percent="0.4" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/container2"
         android:name="edu.temple.audiobookplayer.BookDetailsFragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="435dp"
+        android:layout_height="241dp"
+        android:background="#333333"
         android:outlineProvider="none"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/container1"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.005" />
 
     <Button
         android:id="@+id/searchButton"
         android:layout_width="224dp"
         android:layout_height="52dp"
+        android:backgroundTint="#101010"
         android:foregroundGravity="center"
         android:gravity="center"
         app:icon="@android:drawable/ic_menu_search"
         app:iconGravity="textStart"
         app:iconSize="35sp"
+        app:iconTint="#ff003c"
+        app:iconTintMode="multiply"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.061"
+        app:layout_constraintEnd_toStartOf="@+id/container2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.005" />
+        app:layout_constraintVertical_bias="0.008" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/controlContainer"
+        android:name="edu.temple.audiobookplayer.ControlFragment"
+        android:layout_width="435dp"
+        android:layout_height="170dp"
+        android:background="#131313"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/container2"
+        app:layout_constraintVertical_bias="1.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>
