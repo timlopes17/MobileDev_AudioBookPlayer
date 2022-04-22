@@ -24,8 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.File
-import java.io.FileOutputStream
+import java.io.*
 import java.net.URL
 
 class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInterface, ControlFragment.ControlFragmentInterface {
@@ -42,10 +41,13 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     var isConnected = false
     var once = true
+    lateinit var path : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        path = this.filesDir.absolutePath
 
         val searchButton = findViewById<Button>(R.id.searchButton)
 
@@ -56,6 +58,21 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             onSearchRequested()
             if (supportFragmentManager.backStackEntryCount > 0)
                 supportFragmentManager.popBackStack()
+        }
+
+        if(File("$path/hmFile").exists()){
+            Log.d("HashMap", "Receiving hmFile")
+            ObjectInputStream(FileInputStream("$path/hmFile")).use { it ->
+                //Read the family back from the file
+//                Log.d("File", "${it.readObject()}")
+//                Log.d("File", "${it.readObject()}")
+                hashMap = it.readObject() as HashMap<Int, Int>
+                Log.d("HashMap", "$hashMap")
+            }
+        }
+        else{
+            Log.d("HashMap", "Creating New HashMap")
+            File("$path/hmFile").createNewFile()
         }
 
         var fragment = supportFragmentManager.findFragmentById(R.id.container1)
@@ -84,6 +101,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     suspend fun updateControlFragment(bookId : Int){
         Log.d("NewTest", "updateControlFragment")
+        Log.d("NewTest", "bookId:$bookId")
         val tempBook : Book
         withContext(Dispatchers.IO) {
             val jsonObject = JSONObject(
@@ -111,6 +129,12 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         {
             audioBinder.stop()
             controlFrag.getProgress(0)
+            val hmFile = File("$path/hmFile")
+                ObjectOutputStream(FileOutputStream(hmFile)).use{ it ->
+                    it.writeObject(hashMap)
+                    it.close()
+                }
+
         }
     }
 
@@ -158,9 +182,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             }
             tempLength = jsonObjectId.getInt("duration")
 
-            val path = this.filesDir.absolutePath
-
-            if(File("$path/$tempId.mp3").exists())
+            if(File("$path/$tempId").exists())
                 tempBook = Book(tempTitle, tempAuthor, tempId, tempImg, tempLength, true)
             else
                 tempBook = Book(tempTitle, tempAuthor, tempId, tempImg, tempLength, false)
@@ -188,17 +210,19 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
     override fun playBook(bookId : Int) {
         if(isConnected){
             bookListVM.getBook(bookId)?.run{
-                val path = this@MainActivity.filesDir.absolutePath
                 if(this.downloaded)
                 {
-                    var file = File("$path/$bookId.mp3")
-                    audioBinder.play(file, 0)
+                    Log.d("playBook", "DOWNLOADED")
+                    var file = File("$path/$bookId")
+                    Log.d("playBook HashMap", "$hashMap")
+                    audioBinder.play(file, hashMap.get(bookId)!!)
                 }
                 else
                 {
+                    Log.d("playBook", "NOT DOWNLOADED")
                     audioBinder.play(bookId)
                     CoroutineScope(Dispatchers.Main).launch() {
-                        download("https://kamorris.com/lab/audlib/download.php?id=$bookId", "$path/$bookId.mp3")
+                        download("https://kamorris.com/lab/audlib/download.php?id=$bookId", "$path/$bookId")
                     }
                     hashMap.put(bookId, 0)
                 }
@@ -218,6 +242,11 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
     override fun pauseBook() {
         if(isConnected) {
             audioBinder.pause()
+            val hmFile = "$path/hmFile"
+            ObjectOutputStream(FileOutputStream(hmFile)).use{ it ->
+                it.writeObject(hashMap)
+                it.close()
+            }
         }
     }
 
@@ -239,11 +268,20 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             if(bookProgress?.progress != null && this@MainActivity::controlFrag.isInitialized){
                 Log.d("NewTest", "controlFrag is init")
                 CoroutineScope(Dispatchers.Main).launch() {
-                    updateControlFragment(bookProgress!!.bookId)
+                    if(bookProgress!!.bookId != null && bookProgress!!.bookId != -1)
+                        updateControlFragment(bookProgress!!.bookId)
+                    else
+                        updateControlFragment(bookProgress!!.bookUri?.lastPathSegment!!.toInt())
                 }
             }
             else
                 Log.d("NewTest", "controlFrag is NOT init")
+        }
+
+        if(audioBinder.isPlaying){
+            val playingBook = bookViewModel.getSelectedBook().value
+                hashMap.replace(playingBook!!.id, bookProgress!!.progress)
+            Log.d("HashMap", "$hashMap")
         }
 
         true
@@ -277,7 +315,9 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             URL(link).openStream().use { input ->
                 FileOutputStream(File(path)).use { output ->
                     input.copyTo(output)
+                    output.close()
                 }
+                input.close()
             }
         }
         Log.d("Download", "Finished")
