@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     lateinit var bookViewModel: BookViewModel
 
+    var hashMap : HashMap<Int, Int> = HashMap<Int, Int>()
+
     var isConnected = false
     var once = true
 
@@ -186,19 +188,21 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
     override fun playBook(bookId : Int) {
         if(isConnected){
             bookListVM.getBook(bookId)?.run{
+                val path = this@MainActivity.filesDir.absolutePath
                 if(this.downloaded)
                 {
-
+                    var file = File("$path/$bookId.mp3")
+                    audioBinder.play(file, 0)
                 }
                 else
                 {
                     audioBinder.play(bookId)
-                    withContext(Dispatchers.IO) {
-                        download()
+                    CoroutineScope(Dispatchers.Main).launch() {
+                        download("https://kamorris.com/lab/audlib/download.php?id=$bookId", "$path/$bookId.mp3")
                     }
+                    hashMap.put(bookId, 0)
                 }
             }
-
         }
         else
             Log.d("Service", "NOT CONNECTED")
@@ -268,11 +272,14 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         super.onStop()
     }
 
-    fun download(link: String, path: String) {
-        URL(link).openStream().use { input ->
-            FileOutputStream(File(path)).use { output ->
-                input.copyTo(output)
+    private suspend fun download(link: String, path: String) {
+        withContext(Dispatchers.IO) {
+            URL(link).openStream().use { input ->
+                FileOutputStream(File(path)).use { output ->
+                    input.copyTo(output)
+                }
             }
         }
+        Log.d("Download", "Finished")
     }
 }

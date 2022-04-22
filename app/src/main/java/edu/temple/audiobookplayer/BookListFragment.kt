@@ -1,5 +1,6 @@
 package edu.temple.audiobookplayer
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -80,6 +81,8 @@ class BookListFragment : Fragment() {
 
         override fun onBindViewHolder(holder: BookListViewHolder, position: Int) {
             holder.title.text = books[position].title
+            if(books[position].downloaded)
+                holder.title.setTextColor(Color.parseColor("#00FF00"))
             holder.author.text = books[position].author
             holder.view.setOnClickListener { clickEvent(books[position]) }
         }
