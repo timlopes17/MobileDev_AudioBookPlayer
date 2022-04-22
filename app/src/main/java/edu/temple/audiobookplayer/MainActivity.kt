@@ -25,6 +25,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.io.FileOutputStream
 import java.net.URL
 
 class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInterface, ControlFragment.ControlFragmentInterface {
@@ -90,7 +91,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                     .readLine()
             )
             tempBook = Book(jsonObject.getString("title"), jsonObject.getString("author"),
-                jsonObject.getInt("id"), jsonObject.getString("cover_url"), jsonObject.getInt("duration"))
+                jsonObject.getInt("id"), jsonObject.getString("cover_url"), jsonObject.getInt("duration"), false)
         }
         bookViewModel.setSelectedBook(tempBook)
         once = false
@@ -138,8 +139,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             )
         }
 
-        Log.d("TEST", jsonArray.toString())
-
         for (i in 0 until jsonArray.length()) {
             jsonObject = jsonArray.getJSONObject(i)
             tempTitle = jsonObject.getString("title")
@@ -157,7 +156,12 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             }
             tempLength = jsonObjectId.getInt("duration")
 
-            tempBook = Book(tempTitle, tempAuthor, tempId, tempImg, tempLength)
+            val path = this.filesDir.absolutePath
+
+            if(File("$path/$tempId.mp3").exists())
+                tempBook = Book(tempTitle, tempAuthor, tempId, tempImg, tempLength, true)
+            else
+                tempBook = Book(tempTitle, tempAuthor, tempId, tempImg, tempLength, false)
             tempBookList.add(tempBook)
         }
 
@@ -181,7 +185,20 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
 
     override fun playBook(bookId : Int) {
         if(isConnected){
-            audioBinder.play(bookId)
+            bookListVM.getBook(bookId)?.run{
+                if(this.downloaded)
+                {
+
+                }
+                else
+                {
+                    audioBinder.play(bookId)
+                    withContext(Dispatchers.IO) {
+                        download()
+                    }
+                }
+            }
+
         }
         else
             Log.d("Service", "NOT CONNECTED")
@@ -249,5 +266,13 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         }
         Log.d("Service", "Activity onStop")
         super.onStop()
+    }
+
+    fun download(link: String, path: String) {
+        URL(link).openStream().use { input ->
+            FileOutputStream(File(path)).use { output ->
+                input.copyTo(output)
+            }
+        }
     }
 }

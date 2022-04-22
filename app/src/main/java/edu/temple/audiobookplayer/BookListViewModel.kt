@@ -1,5 +1,6 @@
 package edu.temple.audiobookplayer
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
@@ -32,6 +33,15 @@ class BookListViewModel : ViewModel() {
 
     fun getBookList() : BookList {
         return vmBookList
+    }
+
+    fun getBook(id : Int) : Book?{
+        for(i in 0 until vmBookList.size()){
+            if(vmBookList[i].id == id)
+                return vmBookList[i]
+        }
+        Log.d("BLVM", "getBook failed")
+        return null
     }
 
 }
