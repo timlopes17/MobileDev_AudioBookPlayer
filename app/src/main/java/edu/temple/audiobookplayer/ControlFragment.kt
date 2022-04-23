@@ -60,16 +60,20 @@ class ControlFragment : Fragment() {
             }
         })
 
-        bookViewModel.getSelectedBook().observe(requireActivity()) {
-            val tempBook = it
-            nowText.text = it.title
-            seekBar.max = it.duration
+        bookViewModel.getSelectedBook().observe(requireActivity()){
+            var tempBook = it
 
             playBut.setOnClickListener {
+
                 (requireActivity() as ControlFragment.ControlFragmentInterface).playBook(
                     tempBook.id
                 )
             }
+        }
+
+        bookViewModel.getPlayingBook().observe(requireActivity()) {
+            nowText.text = it.title
+            seekBar.max = it.duration
         }
     }
 

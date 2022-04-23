@@ -49,6 +49,7 @@ class BookListFragment : Fragment() {
                 books?.run{
                     val clickEvent = {
                             book:Book -> bookViewModel.setSelectedBook(book)
+                        Log.d("BLF", "Book Selected Id: ${bookViewModel.getSelectedBook().value!!.id}")
                         (requireActivity() as SelectionFragmentInterface).bookSelected()
                     }
 

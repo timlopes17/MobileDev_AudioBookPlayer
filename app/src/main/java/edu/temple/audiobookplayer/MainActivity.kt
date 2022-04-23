@@ -25,6 +25,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
+import java.lang.Exception
 import java.net.URL
 
 class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInterface, ControlFragment.ControlFragmentInterface {
@@ -38,6 +39,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
     lateinit var bookViewModel: BookViewModel
 
     var hashMap : HashMap<Int, Int> = HashMap<Int, Int>()
+
+    var searchWord : String = ""
 
     var isConnected = false
     var once = true
@@ -63,9 +66,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         if(File("$path/hmFile").exists()){
             Log.d("HashMap", "Receiving hmFile")
             ObjectInputStream(FileInputStream("$path/hmFile")).use { it ->
-                //Read the family back from the file
-//                Log.d("File", "${it.readObject()}")
-//                Log.d("File", "${it.readObject()}")
                 hashMap = it.readObject() as HashMap<Int, Int>
                 Log.d("HashMap", "$hashMap")
             }
@@ -73,6 +73,31 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         else{
             Log.d("HashMap", "Creating New HashMap")
             File("$path/hmFile").createNewFile()
+        }
+
+        if(File("$path/search").exists() && File("$path/search").length() > 0){
+            try {
+                Log.d("ERROR", "ERROR")
+                ObjectInputStream(FileInputStream("$path/search")).use { it ->
+                    Log.d("ERROR", "ERROR")
+                    searchWord = it.readObject() as String
+                    Log.d("ERROR", "ERROR")
+                    if (searchWord == null)
+                        Log.d("searchWord", "is null")
+                    else
+                        Log.d("searchWord", "$searchWord")
+                }
+            }
+            catch (e : Exception){
+                Log.d("ERROR", "ERROR")
+            }
+        }
+        else if(!File("$path/search").exists()){
+            Log.d("searchWord", "Creating File search")
+            File("$path/search").createNewFile()
+        }
+        else{
+            Log.d("searchWord", "File is empty")
         }
 
         var fragment = supportFragmentManager.findFragmentById(R.id.container1)
@@ -97,6 +122,11 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             , BIND_AUTO_CREATE)
 
         controlFrag = supportFragmentManager.findFragmentById(R.id.controlContainer) as ControlFragment
+
+        if(searchWord.length > 0)
+            CoroutineScope(Dispatchers.Main).launch() {
+                searchBooks(searchWord)
+            }
     }
 
     suspend fun updateControlFragment(bookId : Int){
@@ -125,17 +155,16 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                 .addToBackStack(null)
                 .commit()
         }
-        if(this::audioBinder.isInitialized)
-        {
-            audioBinder.stop()
-            controlFrag.getProgress(0)
-            val hmFile = File("$path/hmFile")
-                ObjectOutputStream(FileOutputStream(hmFile)).use{ it ->
-                    it.writeObject(hashMap)
-                    it.close()
-                }
-
-        }
+//        if(this::audioBinder.isInitialized)
+//        {
+//            audioBinder.stop()
+//            controlFrag.getProgress(0)
+//            val hmFile = File("$path/hmFile")
+//                ObjectOutputStream(FileOutputStream(hmFile)).use{ it ->
+//                    it.writeObject(hashMap)
+//                    it.close()
+//                }
+//        }
     }
 
     suspend fun searchBooks(search: String) {
@@ -202,13 +231,24 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             intent!!.getStringExtra(SearchManager.QUERY)?.also { query ->
                 CoroutineScope(Dispatchers.Main).launch() {
                     searchBooks(query)
+                    val searchFile = "$path/search"
+                    ObjectOutputStream(FileOutputStream(searchFile)).use{ it ->
+                        it.writeObject(query)
+                        it.close()
+                    }
                 }
             }
         }
     }
 
     override fun playBook(bookId : Int) {
+        val hmFile = File("$path/hmFile")
+        ObjectOutputStream(FileOutputStream(hmFile)).use{ it ->
+            it.writeObject(hashMap)
+            it.close()
+        }
         if(isConnected){
+            Log.d("playBook", "BookId: $bookId")
             bookListVM.getBook(bookId)?.run{
                 if(this.downloaded)
                 {
