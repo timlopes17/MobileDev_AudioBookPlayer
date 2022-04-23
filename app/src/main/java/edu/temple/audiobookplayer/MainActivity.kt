@@ -100,8 +100,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
     }
 
     suspend fun updateControlFragment(bookId : Int){
-        Log.d("NewTest", "updateControlFragment")
-        Log.d("NewTest", "bookId:$bookId")
+        Log.d("UCF", "updateControlFragment")
+        Log.d("UCF", "bookId:$bookId")
         val tempBook : Book
         withContext(Dispatchers.IO) {
             val jsonObject = JSONObject(
@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             tempBook = Book(jsonObject.getString("title"), jsonObject.getString("author"),
                 jsonObject.getInt("id"), jsonObject.getString("cover_url"), jsonObject.getInt("duration"), false)
         }
-        bookViewModel.setSelectedBook(tempBook)
+        bookViewModel.setPlayingBook(tempBook)
         once = false
     }
 
@@ -216,11 +216,13 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                     var file = File("$path/$bookId")
                     Log.d("playBook HashMap", "$hashMap")
                     audioBinder.play(file, hashMap.get(bookId)!!)
+                    bookViewModel.setPlayingBook(this)
                 }
                 else
                 {
                     Log.d("playBook", "NOT DOWNLOADED")
                     audioBinder.play(bookId)
+                    bookViewModel.setPlayingBook(this)
                     CoroutineScope(Dispatchers.Main).launch() {
                         download("https://kamorris.com/lab/audlib/download.php?id=$bookId", "$path/$bookId")
                     }
@@ -236,6 +238,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         if(isConnected) {
             audioBinder.stop()
             controlFrag.getProgress(0)
+            hashMap.replace(bookViewModel.getPlayingBook().value!!.id, 0)
         }
     }
 
@@ -278,9 +281,12 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                 Log.d("NewTest", "controlFrag is NOT init")
         }
 
-        if(audioBinder.isPlaying){
-            val playingBook = bookViewModel.getSelectedBook().value
-                hashMap.replace(playingBook!!.id, bookProgress!!.progress)
+        if(audioBinder.isPlaying && bookViewModel.getPlayingBook().value != null){
+            val playingBook = bookViewModel.getPlayingBook().value
+//            Log.d("Playing", "${bookViewModel.getPlayingBook().value}")
+//            Log.d("Playing", "$playingBook.id")
+//            Log.d("Playing", "${bookProgress!!.progress}")
+            hashMap.replace(playingBook!!.id, bookProgress!!.progress)
             Log.d("HashMap", "$hashMap")
         }
 

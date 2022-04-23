@@ -9,11 +9,24 @@ class BookViewModel : ViewModel() {
         MutableLiveData<Book>()
     }
 
+    val playingBook : MutableLiveData<Book> by lazy {
+        MutableLiveData<Book>()
+    }
+
+
     fun setSelectedBook(book : Book) {
         selectedBook.value = book
     }
 
     fun getSelectedBook() : LiveData<Book> {
         return selectedBook
+    }
+
+    fun setPlayingBook(book : Book) {
+        playingBook.value = book
+    }
+
+    fun getPlayingBook() : LiveData<Book> {
+        return playingBook
     }
 }
