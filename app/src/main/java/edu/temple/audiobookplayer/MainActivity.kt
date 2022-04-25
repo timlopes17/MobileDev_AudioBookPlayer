@@ -63,11 +63,18 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                 supportFragmentManager.popBackStack()
         }
 
-        if(File("$path/hmFile").exists()){
+        if(File("$path/hmFile").exists() && File("$path/search").length() > 0){
+            Log.d("HashMap", "$path")
             Log.d("HashMap", "Receiving hmFile")
-            ObjectInputStream(FileInputStream("$path/hmFile")).use { it ->
-                hashMap = it.readObject() as HashMap<Int, Int>
-                Log.d("HashMap", "$hashMap")
+            try{
+                ObjectInputStream(FileInputStream("$path/hmFile")).use { it ->
+                    hashMap = it.readObject() as HashMap<Int, Int>
+                    Log.d("HashMap", "$hashMap")
+                }
+            }
+            catch(e : Exception){
+                Log.d("HashMap", "Creating New HashMap")
+                File("$path/hmFile").createNewFile()
             }
         }
         else{
