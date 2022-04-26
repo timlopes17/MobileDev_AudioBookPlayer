@@ -44,7 +44,16 @@ class BookListFragment : Fragment() {
 
             bookListVM.getIncrement().observe(requireActivity()) {
 
+                Log.d("BLF", "new Book List created")
+
                 books = bookListVM.getBookList()
+
+                for(i in 0 until books.size())
+                {
+                    Log.d("BLF", "$i:${books[i].downloaded}")
+                }
+
+                //Log.d("BLF", "${books[4].downloaded}")
 
                 books?.run{
                     val clickEvent = {

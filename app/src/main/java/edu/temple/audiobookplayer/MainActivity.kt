@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
         }
 
         if(File("$path/hmFile").exists() && File("$path/search").length() > 0){
-            Log.d("HashMap", "$path")
+            Log.d("HashMap", path)
             Log.d("HashMap", "Receiving hmFile")
             try{
                 ObjectInputStream(FileInputStream("$path/hmFile")).use { it ->
@@ -112,8 +112,11 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             supportFragmentManager.beginTransaction().remove(fragment).commit()
         }
 
-        if (supportFragmentManager.backStackEntryCount > 0)
+        if (supportFragmentManager.backStackEntryCount > 0){
             supportFragmentManager.popBackStack()
+            bookListVM.increment()
+        }
+
         else
             supportFragmentManager
                 .beginTransaction()
@@ -162,19 +165,11 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                 .addToBackStack(null)
                 .commit()
         }
-//        if(this::audioBinder.isInitialized)
-//        {
-//            audioBinder.stop()
-//            controlFrag.getProgress(0)
-//            val hmFile = File("$path/hmFile")
-//                ObjectOutputStream(FileOutputStream(hmFile)).use{ it ->
-//                    it.writeObject(hashMap)
-//                    it.close()
-//                }
-//        }
     }
 
     suspend fun searchBooks(search: String) {
+
+        Log.d("searchBooks", "Searching...")
 
         var thisSearch = search
         var jsonArray: JSONArray
@@ -225,10 +220,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             tempBookList.add(tempBook)
         }
 
-        //if(jsonArray.length() != 0){
             bookListVM.setBookList(tempBookList)
             bookListVM.increment()
-        //}
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -249,15 +242,15 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
     }
 
     override fun playBook(bookId : Int) {
-        val hmFile = File("$path/hmFile")
-        ObjectOutputStream(FileOutputStream(hmFile)).use{ it ->
-            it.writeObject(hashMap)
-            it.close()
-        }
+//        val hmFile = File("$path/hmFile")
+//        ObjectOutputStream(FileOutputStream(hmFile)).use{ it ->
+//            it.writeObject(hashMap)
+//            it.close()
+//        }
         if(isConnected){
             Log.d("playBook", "BookId: $bookId")
             bookListVM.getBook(bookId)?.run{
-                if(this.downloaded)
+                if(hashMap.containsKey(bookId))
                 {
                     Log.d("playBook", "DOWNLOADED")
                     var file = File("$path/$bookId")
@@ -270,10 +263,13 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
                     Log.d("playBook", "NOT DOWNLOADED")
                     audioBinder.play(bookId)
                     bookViewModel.setPlayingBook(this)
+                    hashMap[bookId] = 0
+                    Log.d("playBook", "${this.id}")
+                    bookListVM.updateBook(this.id)
+                    Log.d("playBook", "${bookListVM.toString(this.id)}")
                     CoroutineScope(Dispatchers.Main).launch() {
                         download("https://kamorris.com/lab/audlib/download.php?id=$bookId", "$path/$bookId")
                     }
-                    hashMap.put(bookId, 0)
                 }
             }
         }
@@ -374,5 +370,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.SelectionFragmentInte
             }
         }
         Log.d("Download", "Finished")
+        bookListVM.increment()
     }
 }

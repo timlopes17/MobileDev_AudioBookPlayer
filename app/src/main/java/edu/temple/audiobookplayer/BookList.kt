@@ -40,6 +40,10 @@ class BookList(): Parcelable {
         return 0
     }
 
+    operator fun set(i: Int, value: Book) {
+
+    }
+
     companion object CREATOR : Parcelable.Creator<BookList> {
         override fun createFromParcel(parcel: Parcel): BookList {
             return BookList(parcel)

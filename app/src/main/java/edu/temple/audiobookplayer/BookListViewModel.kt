@@ -44,4 +44,32 @@ class BookListViewModel : ViewModel() {
         return null
     }
 
+    fun updateBook(id : Int){
+        var tempBookList : BookList = BookList()
+
+        for(i in 0 until vmBookList.size()){
+            tempBookList.add(vmBookList[i])
+        }
+        vmBookList.clear()
+        for(i in 0 until tempBookList.size()){
+            if(id == tempBookList[i].id){
+                Log.d("updateBook", "Book Updated to True")
+                vmBookList.add(Book(tempBookList[i].title, tempBookList[i].author, tempBookList[i].id, tempBookList[i].coverURL, tempBookList[i].duration, true))
+            }
+            else{
+                vmBookList.add(tempBookList[i])
+            }
+        }
+    }
+
+    fun toString(id : Int): String {
+        var myString : String = "^"
+        Log.d("toString", "${vmBookList.size()}")
+        for(i in 0 until vmBookList.size()){
+            if(i == vmBookList[i].id){
+                myString = "size: ${vmBookList.size()} downloaded:${vmBookList[i].downloaded}"
+            }
+        }
+        return myString
+    }
 }
