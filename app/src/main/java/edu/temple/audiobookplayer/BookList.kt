@@ -20,6 +20,10 @@ class BookList(): Parcelable {
         list.remove(_book)
     }
 
+    fun clear(){
+        list.removeAll(list)
+    }
+
     operator fun get(x : Int) : Book{
         return list[x]
     }
@@ -34,6 +38,10 @@ class BookList(): Parcelable {
 
     override fun describeContents(): Int {
         return 0
+    }
+
+    operator fun set(i: Int, value: Book) {
+
     }
 
     companion object CREATOR : Parcelable.Creator<BookList> {

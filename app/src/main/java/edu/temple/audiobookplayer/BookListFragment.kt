@@ -1,6 +1,8 @@
 package edu.temple.audiobookplayer
 
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,18 +17,15 @@ import androidx.recyclerview.widget.RecyclerView
 private const val BOOKS_KEY = "books_key"
 
 class BookListFragment : Fragment() {
-    private var books: BookList? = null
     //private var recyclerView : RecyclerView? = null
     private lateinit var bookViewModel : BookViewModel
+    private lateinit var bookListVM: BookListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         bookViewModel = ViewModelProvider(requireActivity()).get(BookViewModel::class.java)
-
-        arguments?.let {
-            books = it.getParcelable(BOOKS_KEY)
-        }
+        bookListVM = ViewModelProvider(requireActivity()).get(BookListViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -41,14 +40,33 @@ class BookListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         with (view as RecyclerView) {
 
-            books?.run{
-                val clickEvent = {
-                        book:Book -> bookViewModel.setSelectedBook(book)
-                        (requireActivity() as SelectionFragmentInterface).bookSelected()
+            var books: BookList = BookList()
+
+            bookListVM.getIncrement().observe(requireActivity()) {
+
+                Log.d("BLF", "new Book List created")
+
+                books = bookListVM.getBookList()
+
+                for(i in 0 until books.size())
+                {
+                    Log.d("BLF", "$i:${books[i].downloaded}")
                 }
 
-                layoutManager = LinearLayoutManager(requireContext())
-                adapter = BookListAdapter(this, clickEvent)
+                //Log.d("BLF", "${books[4].downloaded}")
+
+                books?.run{
+                    val clickEvent = {
+                            book:Book -> bookViewModel.setSelectedBook(book)
+                        Log.d("BLF", "Book Selected Id: ${bookViewModel.getSelectedBook().value!!.id}")
+                        (requireActivity() as SelectionFragmentInterface).bookSelected()
+                    }
+
+                    layoutManager = LinearLayoutManager(getContext())
+                    adapter = BookListAdapter(this, clickEvent)
+
+                    adapter?.notifyDataSetChanged()
+                }
             }
         }
     }
@@ -73,6 +91,8 @@ class BookListFragment : Fragment() {
 
         override fun onBindViewHolder(holder: BookListViewHolder, position: Int) {
             holder.title.text = books[position].title
+            if(books[position].downloaded)
+                holder.title.setTextColor(Color.parseColor("#00FF00"))
             holder.author.text = books[position].author
             holder.view.setOnClickListener { clickEvent(books[position]) }
         }
@@ -80,16 +100,6 @@ class BookListFragment : Fragment() {
         override fun getItemCount(): Int {
             return books.size()
         }
-    }
-
-    companion object {
-        @JvmStatic
-        fun newInstance(list : BookList) =
-            BookListFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(BOOKS_KEY, list)
-                }
-            }
     }
 
     interface SelectionFragmentInterface {
